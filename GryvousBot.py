@@ -11,7 +11,7 @@ reddit = praw.Reddit(
     username=os.getenv('BOT_USERNAME'),
     password=os.getenv('BOT_PASSWORD'),
     user_agent="GryvousBot:v0.4 (by /u/Kapt_Roodbaard)")
-subreddit = reddit.subreddit('pythonforengineers')
+subreddit = reddit.subreddit('PrequelMemes')
 
 # handler = logging.StreamHandler()
 # handler.setLevel(logging.DEBUG)
@@ -33,20 +33,22 @@ else:
         comments_replied_to = list(filter(None, comments_replied_to))
 
 print("Starting")
+for submission in subreddit.hot(limit=20):
+    submission.comments.replace_more(limit=0)
+    # For every comment in the post
+    for comment in submission.comments.list():
+        # If we haven't replied to this post before
+        if comment.id not in comments_replied_to:
 
-# For every comment in the post
-for comment in subreddit.comments(limit=250):
-    # If we haven't replied to this post before
-    if comment.id not in comments_replied_to:
+            # Do a case insensitive search
+            if re.search("hello there", comment.body, re.IGNORECASE):
+                #print(comment.body)
+                # Reply to the post
+                print("Bot replying to : ", comment.id)
+                comment.reply("General Kenobi, you are a bold one.")                
 
-        # Do a case insensitive search
-        if re.search("hello there", comment.body, re.IGNORECASE):
-            # Reply to the post
-            print("Bot replying to : ", comment.id)
-            comment.reply("General Kenobi, you are a bold one.")                
-
-            # Store the current id into our list
-            comments_replied_to.append(comment.id)
+                # Store the current id into our list
+                comments_replied_to.append(comment.id)
             
 # Write our updated list back to the file
 with open("comments_replied_to.txt", "w") as f:
